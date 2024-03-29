@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 set -o errexit
 set -o nounset
@@ -31,8 +31,8 @@ swapon /dev/vda2
 
 echo "Making mountpoint and mounting /mnt/gentoo/efi"
 
-mkdir --parents /mnt/gentoo
-mount /dev/vda3 /mnt/gentoo
+mkdir --parents /mnt/gentoo/efi
+mount /dev/vda3 /mnt/gentoo/efi
 mount_check "/mnt/gentoo/efi"
 
 cd /mnt/gentoo
@@ -47,18 +47,23 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 
 echo "Mounting filesystems for chroot..."
 mount --types proc /proc /mnt/gentoo/proc
-check_mount_success "/mnt/gentoo/proc"
+mount_check "/mnt/gentoo/proc"
 
 mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
-check_mount_success "/mnt/gentoo/sys"
+mount_check "/mnt/gentoo/sys"
 
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
-check_mount_success "/mnt/gentoo/dev"
+mount_check "/mnt/gentoo/dev"
 
 mount --bind /run /mnt/gentoo/run
 mount --make-slave /mnt/gentoo/run
-check_mount_success "/mnt/gentoo/run"
+mount_check "/mnt/gentoo/run"
 
+chroot /mnt/gentoo /bin/bash 
+source /etc/profile
+export PS1="(chroot) ${PS1}"
 
+mkdir /efi
+mount /dev/vda1 /efi
