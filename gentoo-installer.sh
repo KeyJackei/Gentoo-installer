@@ -42,8 +42,12 @@ tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
 
 echo "Setting up make.conf..."
-echo -ne "COMMON_FLAGS=\"-O2 -march=znver3 -pipe\"\nCFLAGS=\"\${COMMON_FLAGS}\"\nCXXFLAGS=\"\${COMMON_FLAGS}\"\nMAKEOPTS=\"-j3 -l3\"\nACCEPT_LICENSE=\"*\"\n" > /etc/portage/make.conf
+echo -ne "COMMON_FLAGS=\"-O2 -march=znver3 -pipe\"\nCFLAGS=\"\${COMMON_FLAGS}\"\nCXXFLAGS=\"\${COMMON_FLAGS}\"\nMAKEOPTS=\"-j3 -l3\"\nACCEPT_LICENSE=\"*\"\n" > /mnt/gentoo/etc/portage/make.conf
+
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+
+#We also can use "arch-chroot /mnt/gentoo" for mounting,
+#if using Gentoo's install media
 
 echo "Mounting filesystems for chroot..."
 mount --types proc /proc /mnt/gentoo/proc
@@ -64,3 +68,6 @@ mount_check "/mnt/gentoo/run"
 chroot /mnt/gentoo /bin/bash 
 source /etc/profile
 export PS1="(chroot) ${PS1}"
+
+
+
