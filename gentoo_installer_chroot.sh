@@ -8,21 +8,6 @@ INSTALL_KERNEL_PATH="/etc/portage/package.use/installkernel"
 
 INSTALL_KERNEL="sys-kernel/installkernel dracut"
 
-#Check error mount
-mount_check() {
-     if ! mountpoint -q "$1"; then
-        echo "Error: Did not mounted $1"
-        exit 1
-     else
-	echo "$1 Success mounted"
-     fi
-}
-
-
-mkdir /efi
-mount /dev/vda1 /efi
-mount_check /dev/vda1 /efi
-
 
 mkdir --parents /etc/portage/repos.conf
 cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
@@ -45,7 +30,7 @@ check_fail() {
 
 #Updating our environment
 env_upd() {
-	env_update
+	env-update
 	check_fail
 	source /etc/profile
 
@@ -134,6 +119,10 @@ eselect profile show
 conf_locales
 
 add_use_flag_dracut
+
+install_distr_kernel
+
+install_kernel_code
 
 #locale time generate
 #ln -sf ../usr/share/zoneinfo/Asia/Yekaterinburg /etc/localtime
