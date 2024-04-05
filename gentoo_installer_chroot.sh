@@ -154,14 +154,3 @@ ls -l /usr/src/linux
 
 #Add grub flag
 echo "$GRUB_KERNEL" >> "$INSTALL_KERNEL_PATH"
-
-#locale time generate
-#ln -sf ../usr/share/zoneinfo/Asia/Yekaterinburg /etc/localtime
-
-#echo "Time has choosen"
-
-#locale language generate. Default: US-UTF-8
-#sed -i "/^#${LOCALE}/ s/^#//" /etc/locale.gen
-
-#locale-gen
-#echo "locale has generated"
