@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #LOCALE_SET="en_US.utf8"
 #LOCALE="en_US.UTF-8"
