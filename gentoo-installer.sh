@@ -31,9 +31,14 @@ swapon /dev/vda2
 
 echo "Making mountpoint and mounting /mnt/gentoo/efi"
 
+mkdir --parents /mnt/gentoo/
+mount /dev/vda3 /mnt/gentoo/
+mount_check "/mnt/gentoo"
+
+
 mkdir --parents /mnt/gentoo/efi
-mount /dev/vda3 /mnt/gentoo/efi
-mount_check "/mnt/gentoo/efi"
+mount /dev/vda1 /mnt/gentoo/efi
+mount_check /mnt/gentoo/efi
 
 cd /mnt/gentoo
 
