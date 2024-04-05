@@ -38,7 +38,7 @@ mount_check "/mnt/gentoo"
 
 mkdir --parents /mnt/gentoo/efi
 mount /dev/vda1 /mnt/gentoo/efi
-mount_check /mnt/gentoo/efi
+mount_check "/mnt/gentoo/efi"
 
 cd /mnt/gentoo
 
