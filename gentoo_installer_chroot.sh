@@ -8,28 +8,21 @@ INSTALL_KERNEL_PATH="/etc/portage/package.use/installkernel"
 
 INSTALL_KERNEL="sys-kernel/installkernel dracut"
 
-#Check error mount
-mount_check() {
-     if ! mountpoint -q "$1"; then
-        echo "Error: Did not mounted $1"
-        exit 1
-     else
-	echo "$1 Success mounted"
-     fi
-}
+SYSTEMD_PATH="/etc/portage/package.use/systemd"
 
+SYSTEMD_FLAG="sys-apps/systemd boot
+sys-kernel/installkernel systemd-boot"
 
-mkdir /efi
-mount /dev/vda1 /efi
-mount_check /dev/vda1 /efi
+GRUB_KERNEL="sys-kernel/installkernel grub"
 
 
 mkdir --parents /etc/portage/repos.conf
 cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
 
+
 #Checker for any trouble
 script_error() {
-     logger "gen_inst: Failing out"
+     echo "gen_inst: Failing out"
      umount -l /dev
      umount -l /proc
      exit 1
@@ -45,7 +38,7 @@ check_fail() {
 
 #Updating our environment
 env_upd() {
-	env_update
+	env-update
 	check_fail
 	source /etc/profile
 
@@ -53,13 +46,13 @@ env_upd() {
 
 #Syncing with portage
 emerge_webrsync() {
-     logger "Syncing portage"
+     echo "Syncing portage"
      emerge-webrsync
      check_fail
 }
 
 script_em_sync() {
-     logger "Syncing portage"
+     echo "Syncing portage"
      emerge --sync
      check_fail
 }
@@ -107,24 +100,40 @@ add_use_flag_dracut() {
 
 install_distr_kernel() {
 	
-	add_use_flag_dracut
 	echo "Begining installation kernel"
-	emerge --ask sys-kernel/gentoo-kernel
+	emerge sys-kernel/gentoo-kernel
 	emerge --depclean
 }
 
 install_kernel_code() {
 	echo "Begining installation source code of kernel..."
-	emerge --ask sys-kernel/gentoo-sources
+	emerge sys-kernel/gentoo-sources
 	
 }
 
+add_use_flag_systemd() {
+	if [ ! -f "$SYSTEMD_PATH" ]; then
+	    echo "Making $SYSTEMD_PATH"
+	    touch "$SYSTEMD_PATH"
+	fi
+
+	# Writing
+	echo -e "$SYSTEMD_FLAG" > "$SYSTEMD_PATH"
+
+}
 
 
 emerge_webrsync
-    
-script_em_sync
 
+emerge --verbose --oneshot app-portage/mirrorselect
+mirrorselect -i -o >> /etc/portage/make.conf
+
+emerge --oneshot app-portage/cpuid2cpuflags
+cpuid2cpuflags
+echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
+
+
+script_em_sync
 
 profile_no=$(eselect profile list | grep "$(awk '{gsub(/[.()]/, "\\\\&")} END{print $0}' <<< "$PROFILE")" | tail -n1 | cut -d'[' -f2 | cut -d']' -f1)
 eselect profile set $profile_no
@@ -134,6 +143,17 @@ eselect profile show
 conf_locales
 
 add_use_flag_dracut
+
+install_distr_kernel
+
+install_kernel_code
+
+eselect kernel set 1
+
+ls -l /usr/src/linux
+
+#Add grub flag
+echo "$GRUB_KERNEL" >> "$INSTALL_KERNEL_PATH"
 
 #locale time generate
 #ln -sf ../usr/share/zoneinfo/Asia/Yekaterinburg /etc/localtime
@@ -145,14 +165,3 @@ add_use_flag_dracut
 
 #locale-gen
 #echo "locale has generated"
-
-
-
-
-
-
-
-
-
-
-
